@@ -4,6 +4,7 @@ import FeaturedDestinations from "@/components/featured-destinations"
 import RecommendedPackages from "@/components/recommended-packages"
 import TestimonialsSection from "@/components/testimonials-section"
 import { Skeleton } from "@/components/ui/skeleton"
+// import './globals.css' // This MUST be here
 
 export default function HomePage() {
   return (

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -12,15 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-} from "firebase/auth"
-import { doc, setDoc } from "firebase/firestore"
-import { auth, db } from "@/lib/firebase"
+import { supabase } from "@/lib/supabase"
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react"
 
 export default function RegisterPage() {
@@ -69,36 +60,51 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
-      const user = userCredential.user
-
-      // Update user profile
-      await updateProfile(user, {
-        displayName: `${formData.firstName} ${formData.lastName}`,
-      })
-
-      // Create user document in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: `${formData.firstName} ${formData.lastName}`,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        createdAt: new Date(),
-        preferences: {
-          currency: "USD",
-          language: "en",
-          theme: "system",
-          travelStyle: [],
-          budget: "mid-range",
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            display_name: `${formData.firstName} ${formData.lastName}`,
+            full_name: `${formData.firstName} ${formData.lastName}`,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          },
         },
       })
 
+      if (error) throw error
+
+      // Create user profile in the database
+      if (data.user) {
+        const { error: profileError } = await supabase.from("user_profiles").insert({
+          user_id: data.user.id,
+          display_name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          preferences: {
+            currency: "USD",
+            language: "en",
+            theme: "system",
+            travel_style: [],
+            budget: "mid-range",
+            notifications: {
+              email: true,
+              push: true,
+              sms: false,
+            },
+          },
+        })
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError)
+        }
+      }
+
       toast({
         title: "Welcome to TravelEase!",
-        description: "Your account has been created successfully.",
+        description: "Please check your email to verify your account.",
       })
-      router.push("/")
+      router.push("/auth/verify-email")
     } catch (error: any) {
       toast({
         title: "Error",
@@ -112,35 +118,14 @@ export default function RegisterPage() {
 
   const handleGoogleRegister = async () => {
     try {
-      const provider = new GoogleAuthProvider()
-      const result = await signInWithPopup(auth, provider)
-      const user = result.user
-
-      // Create user document in Firestore
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: new Date(),
-          preferences: {
-            currency: "USD",
-            language: "en",
-            theme: "system",
-            travelStyle: [],
-            budget: "mid-range",
-          },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
-        { merge: true },
-      )
-
-      toast({
-        title: "Welcome to TravelEase!",
-        description: "Your account has been created successfully.",
       })
-      router.push("/")
+
+      if (error) throw error
     } catch (error: any) {
       toast({
         title: "Error",
@@ -152,35 +137,14 @@ export default function RegisterPage() {
 
   const handleFacebookRegister = async () => {
     try {
-      const provider = new FacebookAuthProvider()
-      const result = await signInWithPopup(auth, provider)
-      const user = result.user
-
-      // Create user document in Firestore
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: new Date(),
-          preferences: {
-            currency: "USD",
-            language: "en",
-            theme: "system",
-            travelStyle: [],
-            budget: "mid-range",
-          },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
-        { merge: true },
-      )
-
-      toast({
-        title: "Welcome to TravelEase!",
-        description: "Your account has been created successfully.",
       })
-      router.push("/")
+
+      if (error) throw error
     } catch (error: any) {
       toast({
         title: "Error",

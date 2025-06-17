@@ -13,10 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { updateProfile, updatePassword } from "firebase/auth"
-import { doc, updateDoc, getDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase"
 import { User, Mail, Phone, MapPin, Calendar, Camera, Lock, Save } from "lucide-react"
+import { supabase } from "@/lib/supabase"
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -65,7 +63,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       setProfileData({
-        displayName: user.displayName || "",
+        displayName: user.user_metadata?.display_name || "",
         email: user.email || "",
         phone: "",
         location: "",
@@ -73,7 +71,6 @@ export default function ProfilePage() {
         bio: "",
       })
 
-      // Load user preferences from Firestore
       loadUserPreferences()
     }
   }, [user])
@@ -82,19 +79,18 @@ export default function ProfilePage() {
     if (!user) return
 
     try {
-      const userDoc = await getDoc(doc(db, "users", user.uid))
-      if (userDoc.exists()) {
-        const userData = userDoc.data()
-        if (userData.preferences) {
-          setPreferences((prev) => ({ ...prev, ...userData.preferences }))
-        }
-        // Load additional profile data
+      const { data, error } = await supabase.from("user_profiles").select("*").eq("user_id", user.id).single()
+
+      if (error && error.code !== "PGRST116") throw error
+
+      if (data) {
+        setPreferences((prev) => ({ ...prev, ...data.preferences }))
         setProfileData((prev) => ({
           ...prev,
-          phone: userData.phone || "",
-          location: userData.location || "",
-          dateOfBirth: userData.dateOfBirth || "",
-          bio: userData.bio || "",
+          phone: data.phone || "",
+          location: data.location || "",
+          dateOfBirth: data.date_of_birth || "",
+          bio: data.bio || "",
         }))
       }
     } catch (error) {
@@ -108,20 +104,29 @@ export default function ProfilePage() {
 
     setLoading(true)
     try {
-      // Update Firebase Auth profile
-      await updateProfile(user, {
-        displayName: profileData.displayName,
+      // Update auth metadata
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          display_name: profileData.displayName,
+          full_name: profileData.displayName,
+        },
       })
 
-      // Update Firestore document
-      await updateDoc(doc(db, "users", user.uid), {
-        displayName: profileData.displayName,
+      if (authError) throw authError
+
+      // Update user profile in database
+      const { error: profileError } = await supabase.from("user_profiles").upsert({
+        user_id: user.id,
+        display_name: profileData.displayName,
+        email: profileData.email,
         phone: profileData.phone,
         location: profileData.location,
-        dateOfBirth: profileData.dateOfBirth,
+        date_of_birth: profileData.dateOfBirth,
         bio: profileData.bio,
-        updatedAt: new Date(),
+        updated_at: new Date().toISOString(),
       })
+
+      if (profileError) throw profileError
 
       toast({
         title: "Profile updated",
@@ -143,10 +148,13 @@ export default function ProfilePage() {
 
     setLoading(true)
     try {
-      await updateDoc(doc(db, "users", user.uid), {
+      const { error } = await supabase.from("user_profiles").upsert({
+        user_id: user.id,
         preferences,
-        updatedAt: new Date(),
+        updated_at: new Date().toISOString(),
       })
+
+      if (error) throw error
 
       toast({
         title: "Preferences updated",
@@ -178,7 +186,11 @@ export default function ProfilePage() {
 
     setLoading(true)
     try {
-      await updatePassword(user, passwordData.newPassword)
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword,
+      })
+
+      if (error) throw error
 
       setPasswordData({
         currentPassword: "",
@@ -250,9 +262,12 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={user.photoURL || ""} alt={user.displayName || ""} />
+                    <AvatarImage
+                      src={user.user_metadata?.avatar_url || ""}
+                      alt={user.user_metadata?.display_name || ""}
+                    />
                     <AvatarFallback className="text-lg">
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
+                      {user.user_metadata?.display_name?.charAt(0) || user.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <Button variant="outline" size="sm">

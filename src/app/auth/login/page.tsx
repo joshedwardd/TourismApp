@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -11,8 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+import { supabase } from "@/lib/supabase"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 
 export default function LoginPage() {
@@ -28,7 +26,13 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) throw error
+
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
@@ -47,13 +51,14 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-      toast({
-        title: "Welcome!",
-        description: "You have successfully signed in with Google.",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
-      router.push("/")
+
+      if (error) throw error
     } catch (error: any) {
       toast({
         title: "Error",
@@ -65,13 +70,14 @@ export default function LoginPage() {
 
   const handleFacebookLogin = async () => {
     try {
-      const provider = new FacebookAuthProvider()
-      await signInWithPopup(auth, provider)
-      toast({
-        title: "Welcome!",
-        description: "You have successfully signed in with Facebook.",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
-      router.push("/")
+
+      if (error) throw error
     } catch (error: any) {
       toast({
         title: "Error",
