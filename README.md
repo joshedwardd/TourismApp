@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-### Toursim App
+# Toursim App
 ## Getting Started With Tourism App
 
 1. Clone Project
