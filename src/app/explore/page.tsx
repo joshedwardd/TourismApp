@@ -82,7 +82,7 @@ export default function ExplorePage() {
         filtered.sort((a, b) => {
           if (a.featured && !b.featured) return -1
           if (!a.featured && b.featured) return 1
-          return b.reviewCount - a.reviewCount
+          return b.reviewCount -  a.reviewCount
         })
         break
     }
