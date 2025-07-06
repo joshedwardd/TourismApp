@@ -5,14 +5,15 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 1. Clone Project
    ```bash
    git clone https://github.com/joshedwardd/TourismApp.git
+   cd 
    ```
 
-3. Setup Dependencies
+2. Setup Dependencies
    ```bash
    npm install
    ```
 
-2. Set up Environments:
+3. Set up Environments:
    First add .env.local file in TourismApp and insert this inside file:
    ```bash
     NEXT_PUBLIC_SUPABASE_URL=https://bimleslhgrltecrjctds.supabase.co
@@ -21,16 +22,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 
    ```
+4. Run the Project:
+   ```bash
+   npm run dev
+   ```   
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
