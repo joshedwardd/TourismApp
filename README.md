@@ -1,8 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![image](https://github.com/user-attachments/assets/4a35c3c0-2cfd-4f9d-8ea9-dc39139ef040)This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the development server:
+1. Clone Project
+   ```bash
+   git clone https://github.com/joshedwardd/TourismApp.git
+   ```
+
+3. Setup Dependencies
+   ```bash
+   npm install
+   ```
+
+2. Set up Environments:
+   First add .env.local file in TourismApp and insert this inside file:
+   ```bash
+    NEXT_PUBLIC_SUPABASE_URL=https://bimleslhgrltecrjctds.supabase.co
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbWxlc2xoZ3JsdGVjcmpjdGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NTg3OTMsImV4cCI6MjA2NTUzNDc5M30.8DCc7KgkQJIB4zxugJoiHmKfz_zCZ3yX59UGWpL0YUQ
+    SUPABASE_JWT_SECRET = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbWxlc2xoZ3JsdGVjcmpjdGRzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTk1ODc5MywiZXhwIjoyMDY1NTM0NzkzfQ.kxyUMQrc0hYZSA123-IOwLkn8IeB-  GJvHX188f999GM
+
+
+   ```
 
 ```bash
 npm run dev
