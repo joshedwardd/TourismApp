@@ -1,6 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-# Toursim App
+# 🧭 Tourism App
+
+> A modern tourism platform built with [Next.js](https://nextjs.org), powered by Supabase.
+
+![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)
+![License](https://img.shields.io/github/license/joshedwardd/TourismApp)
+
+---
+
 ## Getting Started With Tourism App
 
 1. Clone Project
