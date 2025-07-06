@@ -18,13 +18,13 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
    cd TourismApp
    ```
 
-2. Setup Dependencies
+2. Install Dependencies
    ```bash
    npm install
    ```
 
-3. Set up Environments:
-   First add .env.local file in TourismApp and insert this inside file:
+3. Setup Environments Variable:
+   Create a .env.local file in TourismApp and insert this inside file:
    ```bash
     NEXT_PUBLIC_SUPABASE_URL=https://bimleslhgrltecrjctds.supabase.co
     NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbWxlc2xoZ3JsdGVjcmpjdGRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NTg3OTMsImV4cCI6MjA2NTUzNDc5M30.8DCc7KgkQJIB4zxugJoiHmKfz_zCZ3yX59UGWpL0YUQ
